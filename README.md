@@ -30,6 +30,11 @@ To train the model run:
 python train.py
 ```
 Tensorboard logs will be generated in the tensorboard_dir.
+To see the tensorboard visualisations:
+```javascript
+python -m tensorboard.main --logdir=[PATH_TO_LOGDIR]
+```
+A link will appear on the command line  and on opening it in the browser tensorboard visualisations will be visible.
 For circuits define quantum nodes so that backpropagation is possible through them.
 
 
