@@ -6,7 +6,7 @@ global_dir = 'Desktop/quantum'
 
 log_dir = global_dir + '/' + 'log_files'
 
-Initial_load = False
+initial_load = False
 n_qbits = 2
 lr = 0.00001
 Beta = 0.97
@@ -18,6 +18,6 @@ tensorboard_log_path = '/Desktop/quantum/logging/'
 model_load_path = model_save_path
 
 loss_function_type = "BCE"
-
+weight_decay = 0.1
 num_steps_for_unrolling = 5
  
