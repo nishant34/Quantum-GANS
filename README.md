@@ -15,12 +15,24 @@ Then following requiremenst are there.
 * python 3.6 or gretaer will work(lower versions should also work).
 * pytorch 1.14 
 
+Many simulators are there or QPUs which can be installed depending on what works with the system
 To install pennylane :
 ```javascript
 pip install pennylane
 pip install pennylane-sf
 ```
 SF is the strawberry fields simulator.
+
+To install forest simulator :
+```javascript
+pip install pennylane-forest
+```
+To install cirq simulator :
+```javascript
+pip install pennylane-cirq
+```
+
+
 
 # Training the Quantum GANS:
 The structure is as follows:
