@@ -1,4 +1,5 @@
-import pennylane as qml
+#import tensorflow as tf
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,35 +8,42 @@ import numpy as np
 import os
 from common import *
 import logging
+import pennylane as qml
+from model_qwgan import *
 
-
+#gen = Generator(n_qbits)
+#disc = Discriminator(n_qbits)
 def makedirs(dir_name):
   file_path = os.path.join(global_dir,dir_name)    
   os.mkdir(file_path)
 
-dev = qml.device('strawberryfields.fock', wires=1, cutoff_dim=10)
+#dev = qml.device('strawberryfields.fock', wires=2, cutoff_dim=10)
 #@qml.qnode(dev,interface='torch')
 
-def add_losses_to_generator(gen,disc):
-  gen.gen_circuit()
-  gen.loss_to_optimize = -disc.generate_output()   
+def add_losses_to_generator():
+  #gen.gen_circuit()
+  prob_gen_out = gen_disc_circuit()
+  gen.loss_to_optimize = -prob_gen_out   
+  #gen.loss_to_optimize = -gen.loss_to_optimize
   
 #@qml.qnode(dev,interface='torch')
-def add_loss_to_discriminator(disc,real=False):
+def add_loss_to_discriminator(real=False):
   
   if real==False:
-    disc.disc_circuit()
-    disc.fake_loss_to_optimize += -disc.generate_output()
+    #disc.disc_circuit()
+    prob_disc_out_fake = gen_disc_circuit()
+    disc.fake_loss_to_optimize = -prob_disc_out_fake#negative
     return 
     
   else:
-    get_real_data([phi,theta,omega])
-    disc.disc_circuit()
-    disc.real_loss_to_optimize = disc.generate_output()
+    #get_real_data([phi,theta,omega])
+    #disc.disc_circuit()
+    prob_disc_out_real = real_disc_circuit()
+    disc.real_loss_to_optimize = prob_disc_out_real
  
 
 def get_real_data(angles):
-    qml.Hadmard(wires=0)
+    qml.Hadamard(wires=0)
     qml.Rot(*angles,wires=0)
 
 def global_update_step(gen,disc,step):
@@ -69,7 +77,8 @@ def get_optimizer(param_list):
   #returns optimizer given a parameter list with defined learning rate and weight decay
 
   optimizer = torch.optim.Adam(param_list,lr = lr,weight_decay=weight_decay)
-  return optimizer
+  #opt = tf.keras.optimizers.SGD(0.4)
+  return opt
 
 
 def add_tensorboard_summary(writer,gen,disc,step):
@@ -112,4 +121,3 @@ def save_model(model,dir_name,save_file_name):
     makedirs(dir_name)
   save_path = dir_name+'/'+save_file_name
   model.save_dict(save_path)
-
