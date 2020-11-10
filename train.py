@@ -1,3 +1,4 @@
+
 import pennylane as qml
 import numpy as  np
 import time
@@ -5,16 +6,16 @@ import os
 import torch
 from torch.autograd import Variable
 import torch.nn as nn
-from model_qwgan import Generator,Discriminator
+from model_qwgan import *
 from common import *
 from train_helper import *
 from tqdm import tqdm
-from tensorboard.utils.tensorboard import SummaryWriter,summary
-import pennylane as qml
+from torch.utils.tensorboard import SummaryWriter,summary
+#import pennylane as qml
 
 
 def get_real_data(angles):
-    qml.Hadmard(wires=0)
+    qml.Hadamard(wires=0)
     qml.Rot(*angles,wires=0)
 
 def main():
@@ -24,8 +25,9 @@ def main():
   
 
  #define model
- model_gen = Generator(n_qbits)
- model_disc  = Discriminator(n_qbits)
+ #model_gen = Generator(n_qbits)
+ #model_disc  = Discriminator(n_qbits)
+ 
  
  #initialise summary
  writer = SummaryWriter(log_dir=tensorboard_log_path)
@@ -33,14 +35,16 @@ def main():
  #parse model
  
  #initialise losses 
- add_losses_to_generator(model_gen,model_disc)
- add_loss_to_discriminator(model_disc,real=False)
- add_loss_to_discriminator(model_disc,real=True)
+ add_losses_to_generator()
+ add_loss_to_discriminator(real=False)
+ add_loss_to_discriminator(real=True)
+ model_gen = gen
+ model_disc  = disc
 
 
  #load data
  
- if initilal_load==True:
+ if initial_load==True:
      model_disc_load_name = 'model__' + format(initial_load_epoch,'05') + '__disc.pth'
      load(model_disc,model_load_path,model_disc_load_name)
      model_gen_load_name = 'model__' + format(initial_load_epoch,'05') + '__gen.pth'
@@ -63,19 +67,19 @@ def main():
      
      for step in range(num_steps_per_epoch):
       if disc_train:        
-        model_disc.update_disc()
+        #model_disc.update_disc(step)
         count_disc+=1
         if count_disc>=num_steps_for_unrolling:
             disc_train = False
             count_disc=0
       else:
-          model_gen.update_gen()
+          #model_gen.update_gen(step)
           count_gen+=1
           if count_gen>=num_steps_for_unrolling:
               disc_train = True
               count_gen = 0
       print("----------------------------------------------------------------------------") 
-      print("disc_loss:{}".format(model_disc.fake_loss_to_opimize+model_disc_real_loss_to_optimize),"disc_fake_loss:{}".format(model_disc.fake_loss_to_opimize),"disc_real_loss:{}".format(model_disc.fake_loss_to_opimize),"generator_loss:{}".format(model_gen.loss_to_optimize))
+      print("disc_loss:{}".format(model_disc.fake_loss_to_opimize+model_disc.real_loss_to_optimize),"disc_fake_loss:{}".format(model_disc.fake_loss_to_opimize),"disc_real_loss:{}".format(model_disc.fake_loss_to_opimize),"generator_loss:{}".format(model_gen.loss_to_optimize))
       add_tensorboard_summary(writer,model_gen,model_disc,epoch)
 
      if epoch%epoch_per_check==0:
@@ -86,11 +90,12 @@ def main():
           print("model svaed at epoch:{}".format(epoch))
      
          
+
 if __name__=="__main__":
-    main()
+  main()
 
 
-
+ 
 
 
  
