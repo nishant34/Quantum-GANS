@@ -11,7 +11,7 @@ conda create -n myenv
 source activate myenv
 
 ```
-Then following requiremenst are there.
+Then following requirements are there.
 * python 3.6 or gretaer will work(lower versions should also work).
 * pytorch 1.14 
 
